@@ -41,4 +41,16 @@ public class SubUtil {
         }
     }
 
+    public static String avoidWords(String input, String language) {
+        String r = input;
+        r = r.replaceAll("&#39;", "'");
+        r = r.replaceAll("expend", "exp·end");
+        r = r.replaceAll("你支", "你·支");
+        r = r.replaceAll("你习", "你·习");
+        if (language.contains("zh")) {
+            r = r.replaceAll(" ", "");
+        }
+        return r;
+    }
+
 }

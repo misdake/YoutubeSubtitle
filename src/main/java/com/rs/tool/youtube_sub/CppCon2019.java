@@ -17,18 +17,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CppCon {
+public class CppCon2019 {
     public static void main(String[] args) throws IOException {
 
         HttpClient.init("a2d09c7d76fced01f8be4b1f4cce8bec");
-
         List<String> done = new ArrayList<>();
         if (new File("downloaded.txt").exists()) {
             done = Files.readAllLines(new File("downloaded.txt").toPath());
         }
 
         List<String> todo;
-        ListInfo listInfo = new GetListInfo("PLHTh1InhhwT6V9RVdFRoCG_Pm5udDxG1c").run();
+        ListInfo listInfo = new GetListInfo("PLHTh1InhhwT6KhvViwRiTR7I5s09dLCSw").run();
         todo = new ArrayList<>(Arrays.asList(listInfo.response.playlist.videos));
 
         for (String videoId : todo) {
@@ -53,7 +52,7 @@ public class CppCon {
         try {
             VideoInfo videoInfo = new GetVideoInfo(videoId).run();
             String title = videoInfo.response.captions.title;
-            title = title.replaceAll("CppCon 2018: ", "");
+            title = title.replaceAll("CppCon 2019: ", "");
             title = title.replaceAll(":", "_");
             title = title.replaceAll("[?]", "_");
 
@@ -77,13 +76,7 @@ public class CppCon {
             SubContent subContent = new GetSubContent(caption.caption_content_url).run();
 
             String r = SubUtil.srt2ass(subContent.contents.content);
-            r = r.replaceAll("&#39;", "'");
-            r = r.replaceAll("expend", "exp·end");
-            r = r.replaceAll("你支", "你·支");
-            r = r.replaceAll("你习", "你·习");
-            if (subContent.contents.language.contains("zh")) {
-                r = r.replaceAll(" ", "");
-            }
+            r = SubUtil.avoidWords(r, subContent.contents.language);
 
             Files.write(new File(title + "__" + subContent.contents.language + ".ass").toPath(), r.getBytes(), StandardOpenOption.CREATE);
             return true;
