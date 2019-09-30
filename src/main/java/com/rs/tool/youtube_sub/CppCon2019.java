@@ -30,11 +30,12 @@ public class CppCon2019 {
         ListInfo listInfo = new GetListInfo("PLHTh1InhhwT6KhvViwRiTR7I5s09dLCSw").run();
         todo = new ArrayList<>(Arrays.asList(listInfo.response.playlist.videos));
 
-        for (String videoId : todo) {
+        for (int i = 0; i < todo.size(); i++) {
+            String videoId = todo.get(i);
             if (done.contains(videoId)) {
                 System.out.println("skip: " + videoId);
             } else {
-                boolean success = getVideo(videoId);
+                boolean success = getVideo(i, videoId);
                 if (!success) continue;
                 done.add(videoId);
                 StringBuilder b = new StringBuilder();
@@ -47,7 +48,7 @@ public class CppCon2019 {
 
     }
 
-    private static boolean getVideo(String videoId) {
+    private static boolean getVideo(int index, String videoId) {
         System.out.println("video: " + videoId);
         try {
             VideoInfo videoInfo = new GetVideoInfo(videoId).run();
@@ -58,7 +59,7 @@ public class CppCon2019 {
 
             for (VideoInfo.CaptionInfo caption : videoInfo.response.captions.available_captions) {
                 if (caption.language.equals("en") || caption.language.contains("zh")) {
-                    boolean success = getSub(title, caption);
+                    boolean success = getSub(index, title, caption);
                     if (!success) return false;
                 }
             }
@@ -69,7 +70,7 @@ public class CppCon2019 {
         }
     }
 
-    private static boolean getSub(String title, VideoInfo.CaptionInfo caption) throws IOException {
+    private static boolean getSub(int index, String title, VideoInfo.CaptionInfo caption) throws IOException {
         System.out.println("language: " + caption.language);
 
         try {
@@ -78,7 +79,7 @@ public class CppCon2019 {
             String r = SubUtil.srt2ass(subContent.contents.content);
             r = SubUtil.avoidWords(r, subContent.contents.language);
 
-            Files.write(new File(title + "__" + subContent.contents.language + ".ass").toPath(), r.getBytes(), StandardOpenOption.CREATE);
+            Files.write(new File((index + 1) + ". " + title + "__" + subContent.contents.language + ".ass").toPath(), r.getBytes(), StandardOpenOption.CREATE);
             return true;
         } catch (Exception e) {
             System.out.println("sub fail");
