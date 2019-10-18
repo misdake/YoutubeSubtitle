@@ -33,7 +33,7 @@ public class CppCon2019 {
         for (int i = 0; i < todo.size(); i++) {
             String videoId = todo.get(i);
             if (done.contains(videoId)) {
-                System.out.println("skip: " + videoId);
+                System.out.println("skip: " + (i + 1) + " " + videoId);
             } else {
                 boolean success = getVideo(i, videoId);
                 if (!success) continue;
@@ -49,7 +49,7 @@ public class CppCon2019 {
     }
 
     private static boolean getVideo(int index, String videoId) {
-        System.out.println("video: " + videoId);
+        System.out.println("video: " + (index + 1) + " " + videoId);
         try {
             VideoInfo videoInfo = new GetVideoInfo(videoId).run();
             String title = videoInfo.response.captions.title;
@@ -58,7 +58,7 @@ public class CppCon2019 {
             title = title.replaceAll("[?]", "_");
 
             for (VideoInfo.CaptionInfo caption : videoInfo.response.captions.available_captions) {
-                if (caption.language.equals("en") || caption.language.contains("zh")) {
+                if (caption.language.equals("en")/* || caption.language.contains("zh")*/) {
                     boolean success = getSub(index, title, caption);
                     if (!success) return false;
                 }
@@ -79,10 +79,14 @@ public class CppCon2019 {
             String r = SubUtil.srt2ass(subContent.contents.content);
             r = SubUtil.avoidWords(r, subContent.contents.language);
 
+            title = title.replaceAll("\"", "");
+            title = title.replaceAll("\\\\", "");
+
             Files.write(new File((index + 1) + ". " + title + "__" + subContent.contents.language + ".ass").toPath(), r.getBytes(), StandardOpenOption.CREATE);
             return true;
         } catch (Exception e) {
             System.out.println("sub fail");
+            e.printStackTrace();
             return false;
         }
     }
