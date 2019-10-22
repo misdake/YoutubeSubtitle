@@ -81,6 +81,7 @@ public class CppCon2019 {
 
             title = title.replaceAll("\"", "");
             title = title.replaceAll("\\\\", "");
+            title = title.replaceAll("/", "");
 
             Files.write(new File((index + 1) + ". " + title + "__" + subContent.contents.language + ".ass").toPath(), r.getBytes(), StandardOpenOption.CREATE);
             return true;
